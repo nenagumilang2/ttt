@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio Suara</title>
+<meta name="theme-color" content="#0b7f86">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f1f4f7;
+  --surface: #ffffff;
+  --surface-2: #e7ecf1;
+  --fg: #14202b;
+  --muted: #5a6b79;
+  --line: #d3dce4;
+  --accent: #0b7f86;
+  --accent-fg: #ffffff;
+  --accent-soft: #d6eef0;
+  --danger: #b3261e;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0f171e;
+    --surface: #17222b;
+    --surface-2: #1f2d38;
+    --fg: #e6edf3;
+    --muted: #93a5b3;
+    --line: #2b3b48;
+    --accent: #4cc9cf;
+    --accent-fg: #06262a;
+    --accent-soft: #14383c;
+    --danger: #f2877f;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+h1 { font-size: 1.7rem; line-height: 1.1; letter-spacing: -0.02em; margin: 0; font-weight: 800; }
+h2 { font-size: 1.15rem; margin: 0; font-weight: 700; }
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+label, .label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+textarea, select, input[type="password"], input[type="text"] {
+  width: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font: inherit;
+}
+textarea { min-height: 170px; resize: vertical; padding: 12px 14px; line-height: 1.65; }
+textarea:focus-visible, select:focus-visible, input:focus-visible, button:focus-visible, audio:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.count.over { color: var(--danger); font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.slider { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.slider .head { display: flex; justify-content: space-between; align-items: baseline; }
+.slider output { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.check { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.check input { accent-color: var(--accent); width: 18px; height: 18px; }
+.btn {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); width: 100%; padding: 15px 18px; }
+.btn.small { padding: 7px 12px; font-size: 13px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.error { border: 1px solid var(--danger); color: var(--danger); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.voice-row { display: flex; gap: 10px; }
+.voice-row select { flex: 1 1 auto; min-width: 0; }
+.results { display: flex; flex-direction: column; gap: 12px; }
+.result { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); min-width: 0; }
+.result .meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.result audio { width: 100%; }
+.result .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.result a.btn { text-decoration: none; display: inline-block; }
+[hidden] { display: none !important; }
+@media (max-width: 440px) { .sliders { grid-template-columns: 1fr; gap: 12px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>Studio Suara</h1>
+    <button class="btn small" id="changeKey" type="button" hidden>Kunci API</button>
+  </div>
+
+  <div id="error" class="error" role="alert" hidden></div>
+
+  <section class="panel" id="keyPanel" hidden>
+    <h2>Masukkan kunci API ElevenLabs</h2>
+    <p class="note">Kunci dibuat di akun ElevenLabs kamu (menu API keys). Kunci hanya disimpan di perangkat ini dan dikirim langsung ke ElevenLabs, tidak ke tempat lain.</p>
+    <div class="field">
+      <label for="key">Kunci API</label>
+      <input id="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tempel kunci di sini">
+    </div>
+    <button class="btn primary" id="saveKey" type="button">Simpan dan lanjut</button>
+    <button class="btn" id="forgetKey" type="button" hidden>Hapus kunci dari perangkat ini</button>
+  </section>
+
+  <div id="app" hidden style="display:none;flex-direction:column;gap:16px">
+    <section class="panel">
+      <div class="row">
+        <label for="text">Naskah</label>
+        <span class="count" id="count">0 karakter</span>
+      </div>
+      <textarea id="text" spellcheck="false">Mereka menguasai bumi selama lebih dari 160 juta tahun. Lalu dalam sekejap, semuanya lenyap. Apa yang sebenarnya terjadi?</textarea>
+    </section>
+
+    <section class="panel">
+      <div class="field">
+        <label for="voice">Suara</label>
+        <div class="voice-row">
+          <select id="voice"><option value="">Memuat daftar suara...</option></select>
+          <button class="btn" id="preview" type="button" disabled>Contoh</button>
+        </div>
+        <audio id="previewAudio" hidden></audio>
+      </div>
+
+      <div class="field">
+        <label for="model">Model</label>
+        <select id="model">
+          <option value="eleven_multilingual_v2">Multilingual v2 (stabil)</option>
+          <option value="eleven_v3">v3 (paling ekspresif)</option>
+          <option value="eleven_v4">v4 (terbaru)</option>
+          <option value="eleven_flash_v2_5">Flash v2.5 (cepat dan hemat)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="label">Gaya bicara</div>
+        <div class="chips" id="presets"></div>
+      </div>
+
+      <div class="sliders">
+        <div class="slider">
+          <div class="head"><label for="stability">Stabilitas</label><output id="stabilityOut"></output></div>
+          <input id="stability" type="range" min="0" max="1" step="0.05" value="0.5">
+        </div>
+        <div class="slider">
+          <div class="head"><label for="similarity">Kemiripan</label><output id="similarityOut"></output></div>
+          <input id="similarity" type="range" min="0" max="1" step="0.05" value="0.75">
+        </div>
+        <div class="slider">
+          <div class="head"><label for="style">Ekspresi</label><output id="styleOut"></output></div>
+          <input id="style" type="range" min="0" max="1" step="0.05" value="0">
+        </div>
+        <div class="slider">
+          <div class="head"><label for="speed">Kecepatan</label><output id="speedOut"></output></div>
+          <input id="speed" type="range" min="0.7" max="1.2" step="0.05" value="1">
+        </div>
+      </div>
+      <label class="check" for="boost" style="text-transform:none;letter-spacing:0;font-size:14px;font-weight:400;color:var(--fg)">
+        <input id="boost" type="checkbox" checked>
+        <span>Perkuat kemiripan dengan suara asli</span>
+      </label>
+      <p class="note">Stabilitas rendah membuat suara lebih ekspresif, stabilitas tinggi lebih konsisten. Pada model v3, stabilitas dibulatkan ke tiga tingkat.</p>
+    </section>
+
+    <button class="btn primary" id="generate" type="button" disabled>Buat suara</button>
+
+    <section class="panel" id="resultsPanel" hidden>
+      <div class="label">Hasil</div>
+      <div class="results" id="results"></div>
+    </section>
+
+    <p class="note">Setiap pembuatan suara memakai kredit akun ElevenLabs kamu sesuai jumlah karakter. Pakai hanya suara milikmu sendiri, suara bawaan, atau suara yang pemiliknya sudah mengizinkan.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var API = "https://api.elevenlabs.io/v1";
+  var KEY_NAME = "studio-suara-key";
+  var limits = { eleven_multilingual_v2: 10000, eleven_v3: 5000, eleven_v4: 100000, eleven_flash_v2_5: 40000 };
+  var apiKey = "";
+  var voices = [];
+  var counter = 0;
+  var urls = [];
+
+  var ta = $("text"), voiceSel = $("voice"), modelSel = $("model");
+  var genBtn = $("generate"), previewBtn = $("preview"), previewAudio = $("previewAudio");
+
+  function loadKey() { try { return localStorage.getItem(KEY_NAME) || ""; } catch (e) { return ""; } }
+  function saveKey(k) { try { localStorage.setItem(KEY_NAME, k); } catch (e) { /* tetap di memori */ } }
+  function eraseKey() { try { localStorage.removeItem(KEY_NAME); } catch (e) { /* abaikan */ } }
+
+  function showError(msg) {
+    var box = $("error");
+    if (!msg) { box.hidden = true; box.textContent = ""; return; }
+    box.textContent = msg;
+    box.hidden = false;
+  }
+
+  function apiFetch(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ "xi-api-key": apiKey }, opts.headers || {});
+    return fetch(API + path, opts).catch(function () {
+      throw new Error("Tidak bisa terhubung ke ElevenLabs. Periksa koneksi internet kamu.");
+    });
+  }
+
+  function failMessage(r) {
+    if (r.status === 401) return Promise.resolve("Kunci API tidak valid. Periksa lagi kuncinya.");
+    return r.json().then(function (data) {
+      var d = data && data.detail;
+      if (d && typeof d === "object" && d.message) return d.message;
+      if (typeof d === "string") return d;
+      return "ElevenLabs menolak permintaan (kode " + r.status + ").";
+    }).catch(function () { return "ElevenLabs menolak permintaan (kode " + r.status + ")."; });
+  }
+
+  function showScreen(hasKey) {
+    $("keyPanel").hidden = hasKey;
+    $("app").style.display = hasKey ? "flex" : "none";
+    $("changeKey").hidden = !hasKey;
+  }
+
+  /* Gaya bicara dan slider */
+  var sliders = {
+    stability: { el: $("stability"), out: $("stabilityOut"), fmt: function (v) { return Math.round(v * 100) + "%"; } },
+    similarity: { el: $("similarity"), out: $("similarityOut"), fmt: function (v) { return Math.round(v * 100) + "%"; } },
+    style: { el: $("style"), out: $("styleOut"), fmt: function (v) { return Math.round(v * 100) + "%"; } },
+    speed: { el: $("speed"), out: $("speedOut"), fmt: function (v) { return Number(v).toFixed(2).replace(/0$/, "") + "x"; } }
+  };
+  var presets = [
+    { name: "Natural", stability: 0.5, style: 0, speed: 1 },
+    { name: "Ekspresif", stability: 0.3, style: 0.5, speed: 1 },
+    { name: "Tenang dan stabil", stability: 0.8, style: 0, speed: 0.95 },
+    { name: "Dramatis", stability: 0.25, style: 0.7, speed: 0.9 },
+    { name: "Semangat", stability: 0.35, style: 0.6, speed: 1.1 }
+  ];
+  var chipWrap = $("presets");
+  function markPresets() {
+    for (var i = 0; i < presets.length; i++) {
+      var p = presets[i];
+      var on = Number(sliders.stability.el.value) === p.stability && Number(sliders.style.el.value) === p.style && Number(sliders.speed.el.value) === p.speed;
+      chipWrap.children[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+  }
+  function syncSliders() {
+    Object.keys(sliders).forEach(function (k) { sliders[k].out.textContent = sliders[k].fmt(Number(sliders[k].el.value)); });
+    markPresets();
+  }
+  presets.forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = p.name;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () {
+      sliders.stability.el.value = p.stability;
+      sliders.style.el.value = p.style;
+      sliders.speed.el.value = p.speed;
+      syncSliders();
+    });
+    chipWrap.appendChild(b);
+  });
+  Object.keys(sliders).forEach(function (k) { sliders[k].el.addEventListener("input", syncSliders); });
+  syncSliders();
+
+  function updateCount() {
+    var limit = limits[modelSel.value];
+    var n = ta.value.length;
+    var c = $("count");
+    c.textContent = n.toLocaleString("id-ID") + " / " + limit.toLocaleString("id-ID") + " karakter";
+    c.className = "count" + (n > limit ? " over" : "");
+  }
+  ta.addEventListener("input", updateCount);
+  modelSel.addEventListener("change", updateCount);
+  updateCount();
+
+  /* Daftar suara */
+  function categoryLabel(c) {
+    var map = { premade: "Suara bawaan", cloned: "Suara tiruan milikmu", generated: "Suara buatan", professional: "Suara profesional" };
+    return map[c] || ("Kategori: " + c);
+  }
+  function currentVoice() {
+    for (var i = 0; i < voices.length; i++) if (voices[i].voice_id === voiceSel.value) return voices[i];
+    return null;
+  }
+  function onVoiceChange() {
+    var v = currentVoice();
+    previewBtn.disabled = !(v && v.preview_url);
+  }
+  voiceSel.addEventListener("change", onVoiceChange);
+
+  function loadVoices() {
+    voiceSel.innerHTML = '<option value="">Memuat daftar suara...</option>';
+    genBtn.disabled = true;
+    return apiFetch("/voices").then(function (r) {
+      if (!r.ok) return failMessage(r).then(function (m) { var e = new Error(m); e.status = r.status; throw e; });
+      return r.json();
+    }).then(function (data) {
+      voices = (data.voices || []).map(function (v) {
+        return { voice_id: v.voice_id, name: v.name, category: v.category || "lainnya", preview_url: v.preview_url || null };
+      });
+      voiceSel.innerHTML = "";
+      if (!voices.length) {
+        voiceSel.innerHTML = '<option value="">Belum ada suara di akun ini</option>';
+        return;
+      }
+      var groups = {};
+      voices.forEach(function (v) { (groups[v.category] = groups[v.category] || []).push(v); });
+      Object.keys(groups).forEach(function (cat) {
+        var og = document.createElement("optgroup");
+        og.label = categoryLabel(cat);
+        groups[cat].forEach(function (v) {
+          var o = document.createElement("option");
+          o.value = v.voice_id;
+          o.textContent = v.name;
+          og.appendChild(o);
+        });
+        voiceSel.appendChild(og);
+      });
+      genBtn.disabled = false;
+      onVoiceChange();
+    });
+  }
+
+  previewBtn.addEventListener("click", function () {
+    var v = currentVoice();
+    if (!v || !v.preview_url) return;
+    previewAudio.src = v.preview_url;
+    previewAudio.play().catch(function () { showError("Contoh suara tidak bisa diputar."); });
+  });
+
+  /* Kunci API */
+  function startWithKey(k, fromSave) {
+    apiKey = k;
+    showError("");
+    return loadVoices().then(function () {
+      if (fromSave) saveKey(k);
+      showScreen(true);
+    }).catch(function (e) {
+      if (e.status === 401 || fromSave) {
+        apiKey = "";
+        if (!fromSave) eraseKey();
+        showScreen(false);
+      } else {
+        showScreen(true);
+      }
+      showError(e.message);
+    });
+  }
+  $("saveKey").addEventListener("click", function () {
+    var k = $("key").value.trim();
+    if (!k) { showError("Tempel kunci API dulu."); $("key").focus(); return; }
+    var btn = $("saveKey");
+    btn.disabled = true;
+    btn.textContent = "Memeriksa kunci...";
+    startWithKey(k, true).then(function () {
+      btn.disabled = false;
+      btn.textContent = "Simpan dan lanjut";
+      $("key").value = "";
+    });
+  });
+  $("changeKey").addEventListener("click", function () {
+    showError("");
+    $("forgetKey").hidden = !apiKey;
+    showScreen(false);
+  });
+  $("forgetKey").addEventListener("click", function () {
+    eraseKey();
+    apiKey = "";
+    voices = [];
+    $("forgetKey").hidden = true;
+    showError("");
+    showScreen(false);
+  });
+
+  /* Hasil suara */
+  function canShareFile(file) {
+    try { return !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) { return false; }
+  }
+  function addResult(blob, voiceName, text) {
+    counter++;
+    var name = "suara-" + counter + ".mp3";
+    var url = URL.createObjectURL(blob);
+    urls.push(url);
+    $("resultsPanel").hidden = false;
+    var item = document.createElement("div");
+    item.className = "result";
+    var meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = voiceName + " · " + (text.length > 80 ? text.slice(0, 80) + "..." : text);
+    var audio = document.createElement("audio");
+    audio.controls = true;
+    audio.src = url;
+    var acts = document.createElement("div");
+    acts.className = "acts";
+    var link = document.createElement("a");
+    link.className = "btn small";
+    link.href = url;
+    link.download = name;
+    link.textContent = "Unduh MP3";
+    acts.appendChild(link);
+    var file;
+    try { file = new File([blob], name, { type: "audio/mpeg" }); } catch (e) { file = null; }
+    if (file && canShareFile(file)) {
+      var share = document.createElement("button");
+      share.type = "button";
+      share.className = "btn small";
+      share.textContent = "Bagikan";
+      share.addEventListener("click", function () {
+        navigator.share({ files: [file], title: "Suara dari Studio Suara" }).catch(function () {});
+      });
+      acts.appendChild(share);
+    }
+    item.appendChild(meta);
+    item.appendChild(audio);
+    item.appendChild(acts);
+    var list = $("results");
+    list.insertBefore(item, list.firstChild);
+    while (list.children.length > 8) {
+      list.removeChild(list.lastChild);
+      URL.revokeObjectURL(urls.shift());
+    }
+    return audio;
+  }
+
+  genBtn.addEventListener("click", function () {
+    var text = ta.value.trim();
+    var model = modelSel.value;
+    showError("");
+    if (!text) { showError("Naskah masih kosong."); ta.focus(); return; }
+    if (text.length > limits[model]) { showError("Naskah terlalu panjang untuk model ini."); return; }
+    var v = currentVoice();
+    if (!v) { showError("Pilih suara dulu."); return; }
+    var stability = Number(sliders.stability.el.value);
+    if (model === "eleven_v3") stability = stability < 0.25 ? 0 : stability < 0.75 ? 0.5 : 1;
+    genBtn.disabled = true;
+    genBtn.textContent = "Sedang membuat suara...";
+    apiFetch("/text-to-speech/" + encodeURIComponent(v.voice_id) + "?output_format=mp3_44100_128", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "audio/mpeg" },
+      body: JSON.stringify({
+        text: text,
+        model_id: model,
+        voice_settings: {
+          stability: stability,
+          similarity_boost: Number(sliders.similarity.el.value),
+          style: Number(sliders.style.el.value),
+          speed: Number(sliders.speed.el.value),
+          use_speaker_boost: $("boost").checked
+        }
+      })
+    }).then(function (r) {
+      if (!r.ok) return failMessage(r).then(function (m) { throw new Error(m); });
+      return r.blob();
+    }).then(function (blob) {
+      var audio = addResult(blob, v.name, text);
+      audio.play().catch(function () {});
+    }).catch(function (e) {
+      showError(e.message);
+    }).then(function () {
+      genBtn.disabled = false;
+      genBtn.textContent = "Buat suara";
+    });
+  });
+
+  /* Mulai */
+  var saved = loadKey();
+  if (saved) { startWithKey(saved, false); } else { showScreen(false); }
+
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+})();
+</script>
+</body>
+</html>
